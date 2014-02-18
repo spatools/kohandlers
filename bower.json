@@ -1,0 +1,37 @@
+{
+  "name": "kohandlers",
+  "version": "0.1.0",
+  "authors": [
+    "SPA Tools"
+  ],
+  "description": "Knockout Binding Handlers to simplify Knockout app development",
+  "main": "dist/handlers.js",
+  "keywords": [
+    "knockout",
+    "knockoutjs",
+    "ko",
+    "binding",
+    "handlers",
+    "javascript",
+    "ui",
+    "spatools",
+    "amd"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/spatools/kohandlers",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "typings",
+    "tests"
+  ],
+  "dependencies": {
+    "requirejs": "~2.1.10"
+  },
+  "devDependencies": {
+    "mocha": "~1.17.1",
+    "should": "3.1.2",
+    "sinon": "http://sinonjs.org/releases/sinon-1.8.1.js"
+  }
+}
