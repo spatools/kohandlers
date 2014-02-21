@@ -1,7 +1,7 @@
 ﻿{
   "name": "kohandlers",
   "version": "0.1.0",
-  "description": "Knockout MVVM Extensions to help Knockout app development",
+  "description": "Knockout Binding Handlers to help Knockout app development",
   "main": "dist/komvvm.js",
   "scripts": {
 	"install": "bower install && tsd reinstall",

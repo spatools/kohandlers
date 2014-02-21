@@ -4,7 +4,7 @@
   "authors": [
     "SPA Tools"
   ],
-  "description": "Knockout ",
+  "description": "Knockout Binding Handlers to help Knockout app development",
   "main": "dist/kohandlers.js",
   "keywords": [
     "knockout",
