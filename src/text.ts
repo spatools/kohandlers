@@ -1,6 +1,7 @@
 ﻿/// <reference path="../_definitions.d.ts" />
 
 import ko = require("knockout");
+import _ = require("underscore");
 import utils = require("koutils/utils");
 var handlers = ko.bindingHandlers;
 
@@ -10,7 +11,7 @@ handlers.limitedText = {
             attr = ko.unwrap(options.attr || "text");
 
         if (attr === "html")
-            ko.bindingHandlers.html.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+            handlers.html.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
     },
     update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
         var options = ko.unwrap(valueAccessor()),
@@ -30,15 +31,15 @@ handlers.limitedText = {
         }
 
         if (attr === "text") {
-            ko.bindingHandlers.text.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
+            handlers.text.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
         }
         else if (attr === "html") {
-            ko.bindingHandlers.html.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
+            handlers.html.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
         }
         else {
             var obj = {};
             obj[attr] = result;
-            ko.bindingHandlers.attr.update(element, utils.createAccessor(obj), allBindingsAccessor, viewModel, bindingContext);
+            handlers.attr.update(element, utils.createAccessor(obj), allBindingsAccessor, viewModel, bindingContext);
         }
     }
 };
@@ -56,7 +57,7 @@ handlers.pad = {
             text = right ? text + char : char + text;
         }
 
-        ko.bindingHandlers.text.update(element, utils.createAccessor(prefix + text), allBindingsAccessor, viewModel, bindingContext);
+        handlers.text.update(element, utils.createAccessor(prefix + text), allBindingsAccessor, viewModel, bindingContext);
     }
 };
 
@@ -71,6 +72,6 @@ handlers.format = {
             args.push(ko.unwrap(value));
         });
 
-        ko.bindingHandlers.text.update(element, utils.createAccessor(utils.format.apply(null, args)), allBindingsAccessor, viewModel, bindingContext);
+        handlers.text.update(element, utils.createAccessor(utils.format.apply(null, args)), allBindingsAccessor, viewModel, bindingContext);
     }
 };
