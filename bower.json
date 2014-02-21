@@ -4,8 +4,8 @@
   "authors": [
     "SPA Tools"
   ],
-  "description": "Knockout Binding Handlers to simplify Knockout app development",
-  "main": "dist/handlers.js",
+  "description": "Knockout ",
+  "main": "dist/kohandlers.js",
   "keywords": [
     "knockout",
     "knockoutjs",
@@ -13,7 +13,8 @@
     "binding",
     "handlers",
     "javascript",
-    "ui",
+    "helpers",
+    "simplify",
     "spatools",
     "amd"
   ],
@@ -24,10 +25,11 @@
     "node_modules",
     "bower_components",
     "typings",
-    "tests"
+    "nuget",
+    "test"
   ],
   "dependencies": {
-    "requirejs": "~2.1.10"
+    "koutils": ">=0.1.0"
   },
   "devDependencies": {
     "mocha": "~1.17.1",

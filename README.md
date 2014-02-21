@@ -1,6 +1,6 @@
-﻿# KoHandlers [![Build Status](https://travis-ci.org/spatools/kohandlers.png)](https://travis-ci.org/spatools/kohandlers) [![Bower version](https://badge.fury.io/bo/kohandlers.png)](http://badge.fury.io/bo/kohandlers)
+﻿# KoHandlers [![Build Status](https://travis-ci.org/spatools/kohandlers.png)](https://travis-ci.org/spatools/kohandlers) [![Bower version](https://badge.fury.io/bo/kohandlers.png)](http://badge.fury.io/bo/kohandlers) [![NuGet version](https://badge.fury.io/nu/kohandlers.png)](http://badge.fury.io/nu/kohandlers)
 
-Knockout Binding Handlers to simplify Knockout app development.
+Knockout Utilities Extensions to simplify Knockout app development.
 
 ## Installation
 
@@ -18,16 +18,7 @@ $ Install-Package KoHandlers
 
 ## Usage
 
-You could use geomath in different context.
-
-### Browser (with built file)
-
-Include built script in your HTML file.
-
-```html
-<script type="text/javascript" src="path/to/knockout.js"></script>
-<script type="text/javascript" src="path/to/kohandlers.min.js"></script>
-```
+You could use kohandlers in different context.
 
 ### Browser (AMD from source)
 
@@ -37,32 +28,30 @@ Include built script in your HTML file.
 requirejs.config({
     paths: {
         knockout: 'path/to/knockout',
+        underscore: 'path/to/underscore',
+        koutils: 'path/to/koutils',
         kohandlers: 'path/to/kohandlers'
     }
 });
 ```
 
-Then include promise in your dependencies.
-
-#### Load handlers
+#### Load modules
 
 ```javascript
-define(["kohandlers"], function() {
-    // Your code
+define(["kohandlers/all"], function() {
+    
 });
 ```
 
-#### Configure as app dependency
+### Browser (with built file)
 
-```javascript
-requirejs.config({
-    deps: ['kohandlers'],
+Include built script in your HTML file.
 
-    paths: {
-        knockout: 'path/to/knockout',
-        kohandlers: 'path/to/kohandlers'
-    }
-});
+```html
+<script type="text/javascript" src="path/to/knockout.js"></script>
+<script type="text/javascript" src="path/to/underscore.js"></script>
+<script type="text/javascript" src="path/to/koutils.min.js"></script>
+<script type="text/javascript" src="path/to/kohandlers.min.js"></script>
 ```
 
 ## Documentation

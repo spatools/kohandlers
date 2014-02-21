@@ -10,7 +10,8 @@ module.exports = function (grunt) {
 
     // Define the configuration for all the tasks
     grunt.initConfig({
-        // Configurable paths
+
+        pkg: grunt.file.readJSON("package.json"),
         paths: {
             src: 'src',
             build: 'dist',
@@ -37,12 +38,42 @@ module.exports = function (grunt) {
             test: {
                 src: "<%= paths.test %>/**/*.ts"
             },
+            declaration: {
+                src: "<%= paths.src %>/**/*.ts",
+                dest: "<%= paths.temp %>/",
+                options: {
+                    base_path: '<%= paths.src %>',
+                    declaration: true
+                }
+            },
             dist: {
                 src: "<%= paths.src %>/**/*.ts",
                 dest: "<%= paths.build %>/",
                 options: {
                     base_path: '<%= paths.src %>'
                 }
+            }
+        },
+
+        concat: {
+            declaration: {
+                src: [
+                    "<%= paths.src %>/base.d.ts",
+                    "<%= paths.temp %>/temp.d.ts"
+                ],
+                dest: "<%= paths.build %>/komvvm.d.ts"
+            }
+        },
+
+        tsdamdconcat: {
+            options: {
+                removeReferences: true,
+                basePath: "<%= paths.temp %>",
+                prefixPath: "koutils"
+            },
+            declaration: {
+                src: "<%= paths.temp %>/*.d.ts",
+                dest: "<%= paths.temp %>/temp.d.ts"
             }
         },
 
@@ -73,7 +104,7 @@ module.exports = function (grunt) {
             test: {
                 options: {
                     port: "8080",
-                    open: "http://localhost:8080/tests/index.html",
+                    open: "http://localhost:8080/test/index.html",
                     keepalive: true
                 }
             }
@@ -86,7 +117,7 @@ module.exports = function (grunt) {
         clean: {
             dev: [
                 "<%= paths.src %>/**/*.d.ts",
-                "!<%= paths.src %>/math.d.ts",
+                "!<%= paths.src %>/base.d.ts",
                 "<%= paths.src %>/**/*.js",
                 "<%= paths.src %>/**/*.js.map"
             ],
@@ -95,6 +126,25 @@ module.exports = function (grunt) {
                 "<%= paths.test %>/**/*.js",
                 "<%= paths.test %>/**/*.js.map"
             ],
+            temp: [
+                "<%= paths.temp %>/**/*.*"
+            ]
+        },
+
+        nugetpack: {
+            all: {
+                src: "nuget/*.nuspec",
+                dest: "nuget/",
+
+                options: {
+                    version: "<%= pkg.version %>"
+                }
+            }
+        },
+        nugetpush: {
+            all: {
+                src: "nuget/*.<%= pkg.version %>.nupkg"
+            }
         },
 
         watch: {
@@ -116,9 +166,17 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask("build", ["tslint:dev", "typescript:dist", "jshint:dist"]);
+    grunt.registerTask("fixdecla", function () {
+        var content = grunt.file.read("dist/komvvm.d.ts");
+        content = content.replace(/\.{2}\/typings/g, "../../../typings");
+        grunt.file.write("dist/komvvm.d.ts", content);
+    });
+
+    grunt.registerTask("declaration", ["typescript:declaration", "tsdamdconcat:declaration", "concat:declaration", "clean:temp", "fixdecla"]);
+    grunt.registerTask("build", ["tslint:dev", "typescript:dist", "jshint:dist", "declaration"]);
     grunt.registerTask("dev", ["tslint:dev", "typescript:dev", "jshint:dev"]);
-    grunt.registerTask("test", ["dev", "tslint:test", "typescript:test", "jshint:test", "mocha:test"]);
+    grunt.registerTask("test", ["dev", "tslint:test", "typescript:test", "jshint:test", "mocha:test", "clean"]);
+    grunt.registerTask("nuget", ["nugetpack", "nugetpush"]);
 
     grunt.registerTask("default", ["clean", "test", "build"]);
 };
