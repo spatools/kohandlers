@@ -1,0 +1,76 @@
+﻿/// <reference path="../_definitions.d.ts" />
+
+import ko = require("knockout");
+import utils = require("koutils/utils");
+var handlers = ko.bindingHandlers;
+
+handlers.limitedText = {
+    init: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
+        var options = ko.unwrap(valueAccessor()),
+            attr = ko.unwrap(options.attr || "text");
+
+        if (attr === "html")
+            ko.bindingHandlers.html.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+    },
+    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
+        var options = ko.unwrap(valueAccessor()),
+            text = ko.unwrap(options.text),
+            length = ko.unwrap(options.length),
+            suffix = ko.unwrap(options.suffix || "..."),
+            escapeCR = ko.unwrap(options.escapeCR || false),
+            attr = ko.unwrap(options.attr || "text");
+
+        var result = text;
+        if (text) {
+            if (text.length > length)
+                result = result.substr(0, length) + suffix;
+            if (escapeCR) {
+                result = result.replace(new RegExp("\n", "g"), " ").replace(new RegExp("\r", "g"), " ");
+            }
+        }
+
+        if (attr === "text") {
+            ko.bindingHandlers.text.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
+        }
+        else if (attr === "html") {
+            ko.bindingHandlers.html.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
+        }
+        else {
+            var obj = {};
+            obj[attr] = result;
+            ko.bindingHandlers.attr.update(element, utils.createAccessor(obj), allBindingsAccessor, viewModel, bindingContext);
+        }
+    }
+};
+
+handlers.pad = {
+    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
+        var options = ko.unwrap(valueAccessor()),
+            text = String(ko.unwrap(options.text)),
+            length = ko.unwrap(options.length),
+            char = ko.unwrap(options.char || "0"),
+            prefix = ko.unwrap(options.prefix || ""),
+            right = ko.unwrap(options.right || false);
+
+        while (text.length < length) {
+            text = right ? text + char : char + text;
+        }
+
+        ko.bindingHandlers.text.update(element, utils.createAccessor(prefix + text), allBindingsAccessor, viewModel, bindingContext);
+    }
+};
+
+handlers.format = {
+    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
+        var options = ko.unwrap(valueAccessor()),
+            format = ko.unwrap(options.format),
+            values = ko.unwrap(options.values),
+            args = [format];
+
+        _.each(values, function (value) {
+            args.push(ko.unwrap(value));
+        });
+
+        ko.bindingHandlers.text.update(element, utils.createAccessor(utils.format.apply(null, args)), allBindingsAccessor, viewModel, bindingContext);
+    }
+};
