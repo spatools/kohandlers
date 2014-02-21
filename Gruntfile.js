@@ -61,7 +61,7 @@ module.exports = function (grunt) {
                     "<%= paths.src %>/base.d.ts",
                     "<%= paths.temp %>/temp.d.ts"
                 ],
-                dest: "<%= paths.build %>/komvvm.d.ts"
+                dest: "<%= paths.build %>/kohandlers.d.ts"
             }
         },
 
@@ -167,9 +167,9 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask("fixdecla", function () {
-        var content = grunt.file.read("dist/komvvm.d.ts");
+        var content = grunt.file.read("dist/kohandlers.d.ts");
         content = content.replace(/\.{2}\/typings/g, "../../../typings");
-        grunt.file.write("dist/komvvm.d.ts", content);
+        grunt.file.write("dist/kohandlers.d.ts", content);
     });
 
     grunt.registerTask("declaration", ["typescript:declaration", "tsdamdconcat:declaration", "concat:declaration", "clean:temp", "fixdecla"]);
