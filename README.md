@@ -29,6 +29,7 @@ requirejs.config({
     paths: {
         knockout: 'path/to/knockout',
         underscore: 'path/to/underscore',
+        jquery: 'path/to/jquery',
         koutils: 'path/to/koutils',
         kohandlers: 'path/to/kohandlers'
     }
@@ -50,10 +51,11 @@ Include built script in your HTML file.
 ```html
 <script type="text/javascript" src="path/to/knockout.js"></script>
 <script type="text/javascript" src="path/to/underscore.js"></script>
+<script type="text/javascript" src="path/to/jquery.js"></script>
 <script type="text/javascript" src="path/to/koutils.min.js"></script>
 <script type="text/javascript" src="path/to/kohandlers.min.js"></script>
 ```
 
 ## Documentation
 
-For now documentation can be found in code.
+Documentation is hosted on [Github Wiki](https://github.com/spatools/kohandlers/wiki).
