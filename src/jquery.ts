@@ -65,9 +65,9 @@ handlers.toggle = {
 handlers.dblclick = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
         var fn = valueAccessor();
-        $(element).dblclick(function () {
+        $(element).dblclick(function (e) {
             var data = ko.dataFor(this);
-            fn.call(viewModel, data);
+            fn.call(viewModel, data, e);
         });
     }
 };
