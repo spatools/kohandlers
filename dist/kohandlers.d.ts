@@ -1,7 +1,6 @@
 /// <reference path="../../../typings/knockout/knockout.d.ts" />
 
 interface KnockoutBindingHandlers {
-    date: KnockoutBindingHandler;
     command: KnockoutBindingHandler;
     loader: KnockoutBindingHandler;
     limitedText: KnockoutBindingHandler;
@@ -23,3 +22,25 @@ interface KnockoutBindingHandlers {
     console: KnockoutBindingHandler;
 }
 
+declare module "koutils/all" {
+var result: boolean;
+export = result;
+}
+
+declare module "koutils/development" {
+}
+
+declare module "koutils/filesize" {
+}
+
+declare module "koutils/helpers" {
+}
+
+declare module "koutils/jquery" {
+}
+
+declare module "koutils/text" {
+}
+
+declare module "koutils/ui" {
+}
