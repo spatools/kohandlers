@@ -72,15 +72,15 @@ handlers.dblclick = {
     }
 };
 
-function createToggleClassAccessor(element: HTMLElement, off: boolean, on: boolean, down: boolean) {
+function appendClasses(obj: any, classes: string, value: boolean): void {
+    _.each(classes.split(/\s+/), (cssClass) => {
+        if (!obj[cssClass])
+            obj[cssClass] = value;
+    });
+}
+function createToggleClassAccessor(element: HTMLElement, off: boolean, on: boolean, down: boolean): () => any {
     var data = $(element).data("ko-toggle-class"),
-        result = {},
-        appendClasses = function (obj, classes, value) {
-            _.each(classes.split(/\s+/), function (_class) {
-                if (!obj[_class])
-                    obj[_class] = value;
-            });
-        };
+        result = {};
 
     if (data.off === data.on)
         appendClasses(result, data.off, off || on);
