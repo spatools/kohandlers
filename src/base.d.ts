@@ -1,7 +1,6 @@
 ﻿/// <reference path="../typings/knockout/knockout.d.ts" />
 
 interface KnockoutBindingHandlers {
-    date: KnockoutBindingHandler;
     command: KnockoutBindingHandler;
     loader: KnockoutBindingHandler;
     limitedText: KnockoutBindingHandler;
