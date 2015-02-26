@@ -27,16 +27,14 @@ module.exports = function (grunt) {
             options: {
                 target: "es3",
                 module: "amd",
-                sourcemap: false,
+                sourceMap: false,
                 declaration: false,
-                comments: false,
-                disallowbool: true,
-                disallowimportmodule: true
+                removeComments: true
             },
             dev: {
                 src: "<%= paths.src %>/**/*.ts",
                 options: {
-                    sourcemap: true
+                    sourceMap: true
                 }
             },
             test: {
