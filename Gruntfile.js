@@ -1,7 +1,11 @@
 ﻿'use strict';
 
 module.exports = function (grunt) {
-    require('load-grunt-tasks')(grunt); // Load grunt tasks automatically
+    // Load grunt tasks automatically
+    require("jit-grunt")(grunt, {
+        nugetpack: "grunt-nuget",
+        nugetpush: "grunt-nuget"
+    });
     require('time-grunt')(grunt); // Time how long tasks take. Can help when optimizing build times
 
     var options = {
@@ -42,7 +46,7 @@ module.exports = function (grunt) {
                 src: "<%= paths.src %>/**/*.ts",
                 dest: "<%= paths.temp %>/",
                 options: {
-                    base_path: '<%= paths.src %>',
+                    basePath: '<%= paths.src %>',
                     declaration: true
                 }
             },
@@ -50,7 +54,7 @@ module.exports = function (grunt) {
                 src: "<%= paths.src %>/**/*.ts",
                 dest: "<%= paths.build %>/",
                 options: {
-                    base_path: '<%= paths.src %>'
+                    basePath: '<%= paths.src %>'
                 }
             }
         },
