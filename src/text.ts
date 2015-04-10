@@ -1,7 +1,6 @@
 ﻿/// <reference path="../_definitions.d.ts" />
 
 import ko = require("knockout");
-import _ = require("underscore");
 import utils = require("koutils/utils");
 var handlers = ko.bindingHandlers;
 
@@ -68,7 +67,7 @@ handlers.format = {
             values = ko.unwrap(options.values),
             args = [format];
 
-        _.each(values, function (value) {
+        values.forEach(value => {
             args.push(ko.unwrap(value));
         });
 

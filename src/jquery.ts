@@ -1,7 +1,6 @@
 ﻿/// <reference path="../_definitions.d.ts" />
 
 import ko = require("knockout");
-import _ = require("underscore");
 import $ = require("jquery");
 import utils = require("koutils/utils");
 var handlers = ko.bindingHandlers;
@@ -9,11 +8,14 @@ var handlers = ko.bindingHandlers;
 handlers.on = {
     init: function (element, valueAccessor) {
         var handlers = ko.unwrap(valueAccessor()),
-            $element = $(element);
+            $element = $(element),
+            key: string, handler: (e) => any;
 
-        _.each(handlers, (handler: (e: JQueryEventObject) => any, key?: string) => {
-            $element.on(key, handler);
-        });
+        for (key in handlers) {
+            if (utils.is((handler = handlers[key]), "function")) {
+                $element.on(key, handler);
+            }
+        }
     }
 };
 
@@ -26,19 +28,19 @@ handlers.hover = {
 
         $(element)
             .on("mouseover", function (e: JQueryEventObject) {
-                if (value.enter)
-                    value.enter.call(viewModel, viewModel, e.originalEvent);
+            if (value.enter)
+                value.enter.call(viewModel, viewModel, e.originalEvent);
 
-                if (value.classes)
-                    ko.bindingHandlers.css.update(element, utils.createAccessor(value.classes), allBindingsAccessor, viewModel, bindingContext);
-            })
+            if (value.classes)
+                ko.bindingHandlers.css.update(element, utils.createAccessor(value.classes), allBindingsAccessor, viewModel, bindingContext);
+        })
             .on("mouseout", function (e: JQueryEventObject) {
-                if (value.leave)
-                    value.leave.call(viewModel, viewModel, e.originalEvent);
+            if (value.leave)
+                value.leave.call(viewModel, viewModel, e.originalEvent);
 
-                if (value.classes)
-                    ko.bindingHandlers.css.update(element, utils.createAccessor(""), allBindingsAccessor, viewModel, bindingContext);
-            });
+            if (value.classes)
+                ko.bindingHandlers.css.update(element, utils.createAccessor(""), allBindingsAccessor, viewModel, bindingContext);
+        });
     }
 };
 
@@ -49,7 +51,7 @@ handlers.toggle = {
             event = ko.unwrap(options.event) || "click",
             eventValue = {};
 
-        if (_.isBoolean(options))
+        if (utils.is(options, "boolean"))
             options = { value: value };
 
         var handler = function () {
@@ -73,7 +75,7 @@ handlers.dblclick = {
 };
 
 function appendClasses(obj: any, classes: string, value: boolean): void {
-    _.each(classes.split(/\s+/), (cssClass) => {
+    classes.split(/\s+/g).forEach(cssClass => {
         if (!obj[cssClass])
             obj[cssClass] = value;
     });

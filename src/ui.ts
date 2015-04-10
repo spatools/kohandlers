@@ -1,7 +1,6 @@
 ﻿/// <reference path="../_definitions.d.ts" />
 
 import ko = require("knockout");
-import _ = require("underscore");
 import $ = require("jquery");
 import utils = require("koutils/utils");
 var handlers = ko.bindingHandlers;
@@ -58,9 +57,11 @@ handlers.editable = {
             handlers.options.update(input.get(0), utils.createAccessor(options.options), allBindingsAccessor, viewModel, bindingContext);
 
             if (allBindings.optionsText) {
-                var optionsText = ko.unwrap(allBindings.optionsText);
+                var optionsText = ko.unwrap(allBindings.optionsText),
+                    selectOptions: any[] = ko.unwrap(options.options);
+
                 if (typeof (optionsText) === "string") {
-                    var _selected = _.find(ko.unwrap(options.options), function (item) {
+                    var _selected = selectOptions.filter(item => {
                         if (allBindings.optionsValue) {
                             var optionsValue = ko.unwrap(allBindings.optionsValue);
                             if (typeof (optionsValue) === "string") {
@@ -72,7 +73,7 @@ handlers.editable = {
                         }
 
                         return item === value;
-                    });
+                    })[0];
 
                     if (_selected)
                         value = _selected[optionsText];
