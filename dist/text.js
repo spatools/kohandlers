@@ -1,4 +1,4 @@
-define(["require", "exports", "knockout", "underscore", "koutils/utils"], function (require, exports, ko, _, utils) {
+define(["require", "exports", "knockout", "koutils/utils"], function (require, exports, ko, utils) {
     var handlers = ko.bindingHandlers;
     handlers.limitedText = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
@@ -41,7 +41,7 @@ define(["require", "exports", "knockout", "underscore", "koutils/utils"], functi
     handlers.format = {
         update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var options = ko.unwrap(valueAccessor()), format = ko.unwrap(options.format), values = ko.unwrap(options.values), args = [format];
-            _.each(values, function (value) {
+            values.forEach(function (value) {
                 args.push(ko.unwrap(value));
             });
             handlers.text.update(element, utils.createAccessor(utils.format.apply(null, args)), allBindingsAccessor, viewModel, bindingContext);

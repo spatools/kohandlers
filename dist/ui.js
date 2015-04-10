@@ -1,4 +1,4 @@
-define(["require", "exports", "knockout", "underscore", "jquery", "koutils/utils"], function (require, exports, ko, _, $, utils) {
+define(["require", "exports", "knockout", "jquery", "koutils/utils"], function (require, exports, ko, $, utils) {
     var handlers = ko.bindingHandlers;
     handlers.editable = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
@@ -33,9 +33,9 @@ define(["require", "exports", "knockout", "underscore", "jquery", "koutils/utils
             if (type === "select" && options.options) {
                 handlers.options.update(input.get(0), utils.createAccessor(options.options), allBindingsAccessor, viewModel, bindingContext);
                 if (allBindings.optionsText) {
-                    var optionsText = ko.unwrap(allBindings.optionsText);
+                    var optionsText = ko.unwrap(allBindings.optionsText), selectOptions = ko.unwrap(options.options);
                     if (typeof (optionsText) === "string") {
-                        var _selected = _.find(ko.unwrap(options.options), function (item) {
+                        var _selected = selectOptions.filter(function (item) {
                             if (allBindings.optionsValue) {
                                 var optionsValue = ko.unwrap(allBindings.optionsValue);
                                 if (typeof (optionsValue) === "string") {
@@ -46,7 +46,7 @@ define(["require", "exports", "knockout", "underscore", "jquery", "koutils/utils
                                 }
                             }
                             return item === value;
-                        });
+                        })[0];
                         if (_selected)
                             value = _selected[optionsText];
                     }

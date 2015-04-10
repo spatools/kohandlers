@@ -1,11 +1,13 @@
-define(["require", "exports", "knockout", "underscore", "jquery", "koutils/utils"], function (require, exports, ko, _, $, utils) {
+define(["require", "exports", "knockout", "jquery", "koutils/utils"], function (require, exports, ko, $, utils) {
     var handlers = ko.bindingHandlers;
     handlers.on = {
         init: function (element, valueAccessor) {
-            var handlers = ko.unwrap(valueAccessor()), $element = $(element);
-            _.each(handlers, function (handler, key) {
-                $element.on(key, handler);
-            });
+            var handlers = ko.unwrap(valueAccessor()), $element = $(element), key, handler;
+            for (key in handlers) {
+                if (utils.is((handler = handlers[key]), "function")) {
+                    $element.on(key, handler);
+                }
+            }
         }
     };
     handlers.hover = {
@@ -29,7 +31,7 @@ define(["require", "exports", "knockout", "underscore", "jquery", "koutils/utils
     handlers.toggle = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var value = valueAccessor(), options = ko.unwrap(value), event = ko.unwrap(options.event) || "click", eventValue = {};
-            if (_.isBoolean(options))
+            if (utils.is(options, "boolean"))
                 options = { value: value };
             var handler = function () {
                 if (ko.isWriteableObservable(options.value))
@@ -49,7 +51,7 @@ define(["require", "exports", "knockout", "underscore", "jquery", "koutils/utils
         }
     };
     function appendClasses(obj, classes, value) {
-        _.each(classes.split(/\s+/), function (cssClass) {
+        classes.split(/\s+/g).forEach(function (cssClass) {
             if (!obj[cssClass])
                 obj[cssClass] = value;
         });
