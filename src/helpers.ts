@@ -1,34 +1,52 @@
-﻿/// <reference path="../_definitions.d.ts" />
+﻿import {
+    bindingHandlers,
+    unwrap,
+    MaybeSubscribable
+} from "knockout";
 
-import ko = require("knockout");
-import utils = require("koutils/utils");
-var handlers = ko.bindingHandlers;
+bindingHandlers.src = {
+    update(element, valueAccessor) {
+        var value = unwrap(valueAccessor());
 
-handlers.src = {
-    update: function (element, valueAccessor) {
-        var value = ko.unwrap(valueAccessor());
-
-        if (element.src !== value)
+        if (element.getAttribute("src") !== value) {
             element.setAttribute("src", value);
+        }
     }
 };
 
-handlers.href = {
-    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var value = ko.unwrap(valueAccessor());
-        ko.bindingHandlers.attr.update(element, utils.createAccessor({ href: value }), allBindingsAccessor, viewModel, bindingContext);
+bindingHandlers.href = {
+    update(element, valueAccessor) {
+        const href = unwrap(valueAccessor());
+        bindingHandlers.attr.update(element, () => { return { href }; });
     }
 };
 
-handlers.mailto = {
-    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var email = ko.unwrap(valueAccessor());
-        ko.bindingHandlers.href.update(element, utils.createAccessor("mailto:" + email), allBindingsAccessor, viewModel, bindingContext);
+bindingHandlers.mailto = {
+    update(element, valueAccessor) {
+        const email = unwrap(valueAccessor());
+        bindingHandlers.href.update(element, () => "mailto:" + email);
     }
 };
 
-handlers.classes = {
-    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        ko.bindingHandlers.css.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+bindingHandlers.classes = {
+    update(element, valueAccessor) {
+        bindingHandlers.css.update(element, valueAccessor);
     }
 };
+
+declare module "knockout" {
+    interface BindingHandlers {
+        src: {
+            update(element: HTMLImageElement, valueAccessor: () => MaybeSubscribable<string>): void;
+        };
+        href: {
+            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>): void;
+        };
+        mailto: {
+            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>): void;
+        };
+        classes: {
+            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>): void;
+        };
+    }
+}

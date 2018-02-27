@@ -1,74 +1,80 @@
-﻿/// <reference path="../_definitions.d.ts" />
+﻿import {
+    bindingHandlers,
+    unwrap,
 
-import ko = require("knockout");
-import $ = require("jquery");
-import utils = require("koutils/utils");
-var handlers = ko.bindingHandlers;
+    MaybeSubscribable
+} from "knockout";
 
-handlers.editable = {
-    init: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var options = ko.unwrap(valueAccessor()),
-            value = ko.unwrap(options.value),
-            isEdit = ko.unwrap(options.isEdit || false),
-            type = ko.unwrap(options.type || "text"),
+import * as $ from "jquery";
+
+bindingHandlers.editable = {
+    init(element, valueAccessor, allBindingsAccessor) {
+        var options = unwrap(valueAccessor()),
+            value = unwrap(options.value),
+            isEdit = unwrap(options.isEdit || false),
+            type = unwrap(options.type || "text"),
             input = null;
 
-        if (type === "textarea")
+        if (type === "textarea") {
             input = $("<textarea>").attr({ "class": "textarea-editable" });
-        else if (type === "select")
+        } else if (type === "select") {
             input = $("<select>").attr({ "class": "select-editable" });
-        else
+        } else {
             input = $("<input>").attr({ "class": "input-editable", type: type });
+        }
 
-        if (element.hasAttribute("id"))
+        if (element.hasAttribute("id")) {
             input.attr("name", element.getAttribute("id"));
+        }
 
         $(element).after(input);
         input.after($("<del>"));
 
         if (type === "checkbox") {
-            handlers.checked.init(input.get(0), utils.createAccessor(options.value), allBindingsAccessor, viewModel, bindingContext);
+            return bindingHandlers.checked.init(input.get(0), () => options.value, allBindingsAccessor);
             //input.after($("<del>"));
         }
-        else
-            handlers.value.init(input.get(0), utils.createAccessor(options.value), allBindingsAccessor, viewModel, bindingContext);
+        else {
+            return bindingHandlers.value.init(input.get(0), () => options.value, allBindingsAccessor);
+        }
     },
-    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var allBindings = allBindingsAccessor(),
-            options = ko.unwrap(valueAccessor()),
-            value = ko.unwrap(options.value),
-            isEdit = ko.unwrap(options.isEdit || false),
-            type = ko.unwrap(options.type || "text"),
+    update(element, valueAccessor, allBindingsAccessor) {
+        const
+            allBindings = allBindingsAccessor(),
+            options = unwrap(valueAccessor()),
+            isEdit = unwrap(options.isEdit || false),
+            type = unwrap(options.type || "text"),
             input = $(element).next(),
             del = input.nextAll("del");
 
-        handlers.visible.update(element, utils.createAccessor(!isEdit), allBindingsAccessor, viewModel, bindingContext);
-        handlers.visible.update(input.get(0), utils.createAccessor(isEdit), allBindingsAccessor, viewModel, bindingContext);
-        handlers.visible.update(del.get(0), utils.createAccessor(isEdit), allBindingsAccessor, viewModel, bindingContext);
+        bindingHandlers.visible.update(element, () => !isEdit);
+        bindingHandlers.visible.update(input.get(0), () => isEdit);
+        bindingHandlers.visible.update(del.get(0), () => isEdit);
 
         if (type === "checkbox") {
-            handlers.visible.update(input.next("del").get(0), utils.createAccessor(isEdit), allBindingsAccessor, viewModel, bindingContext);
-            handlers.checked.update(input.get(0), utils.createAccessor(options.value), allBindingsAccessor, viewModel, bindingContext);
+            bindingHandlers.visible.update(input.next("del").get(0), () => isEdit);
+            // bindingHandlers.checked.update(input.get(0), () => options.value, allBindingsAccessor);
         }
         else
-            handlers.value.update(input.get(0), utils.createAccessor(options.value), allBindingsAccessor, viewModel, bindingContext);
+            bindingHandlers.value.update(input.get(0), () => options.value, allBindingsAccessor);
 
+        let value = unwrap(options.value);
         if (type === "select" && options.options) {
-            handlers.options.update(input.get(0), utils.createAccessor(options.options), allBindingsAccessor, viewModel, bindingContext);
+            bindingHandlers.options.update(input.get(0), () => options.options, allBindingsAccessor);
 
             if (allBindings.optionsText) {
-                var optionsText = ko.unwrap(allBindings.optionsText),
-                    selectOptions: any[] = ko.unwrap(options.options);
+                var optionsText = unwrap(allBindings.optionsText),
+                    selectOptions = unwrap(options.options);
 
                 if (typeof (optionsText) === "string") {
                     var _selected = selectOptions.filter(item => {
                         if (allBindings.optionsValue) {
-                            var optionsValue = ko.unwrap(allBindings.optionsValue);
+                            var optionsValue = unwrap(allBindings.optionsValue);
                             if (typeof (optionsValue) === "string") {
-                                return ko.unwrap(item[optionsValue]) === value;
+                                return unwrap(item[optionsValue]) === value;
                             }
                             else if (typeof (optionsValue) === "function") {
-                                return ko.unwrap(optionsValue.call(null, item)) === value;
+                                return unwrap(optionsValue.call(null, item)) === value;
                             }
                         }
 
@@ -78,7 +84,7 @@ handlers.editable = {
                     if (_selected)
                         value = _selected[optionsText];
                 }
-                else if (typeof (optionsText) === "function") {
+                else if (typeof optionsText === "function") {
                     var _val = optionsText.call(null, value);
                     if (_val)
                         value = _val;
@@ -86,37 +92,58 @@ handlers.editable = {
             }
         }
 
-        handlers.text.update(element, utils.createAccessor(value), allBindingsAccessor, viewModel, bindingContext);
+        bindingHandlers.text.update(element, () => value);
     }
 };
 
-handlers.clipboard = {
-    init: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var _value = ko.unwrap(valueAccessor());
+bindingHandlers.clipboard = {
+    init(element, valueAccessor) {
+        const
+            value = unwrap(valueAccessor()),
+            input = $("<input>").attr({ "class": "input-clipboard", "readonly": "readonly" }).val(value).hide();
 
-        var input = $("<input>").attr({ "class": "input-clipboard", "readonly": "readonly" }).val(_value).hide();
+        $(element).after(input).text(value);
 
-        $(element).after(input).text(_value);
-
-        $(element).on("click", function () {
+        $(element).on("click", () => {
             $(element).hide();
             input.show().focus().select();
         });
 
         input
-            .on("focusout", function () {
+            .on("focusout", () => {
                 $(element).show();
                 input.hide();
             })
-            .on("click", function () {
+            .on("click", () => {
                 $(this).select();
             });
     },
-    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var _value = ko.unwrap(valueAccessor());
-        var input = $(element).next();
+    update(element, valueAccessor) {
+        const
+            value = unwrap(valueAccessor()),
+            input = $(element).next();
 
-        $(element).text(_value).show();
-        input.val(_value).hide();
+        $(element).text(value).show();
+        input.val(value).hide();
     }
 };
+
+declare module "knockout" {
+    interface BindingHandlers {
+        editable: {
+            init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<EditableOptions>, allBindingsAccessor: AllBindingsAccessor): void;
+            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<EditableOptions>, allBindingsAccessor: AllBindingsAccessor): void;
+        };
+        clipboard: {
+            init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>): void;
+            update(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>): void;
+        };
+    }
+}
+
+export interface EditableOptions {
+    value: string;
+    isEdit?: MaybeSubscribable<boolean>;
+    type?: MaybeSubscribable<string>;
+    options?: MaybeSubscribable<any[]>;
+}

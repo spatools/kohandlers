@@ -1,10 +1,4 @@
-﻿/// <reference path="../_definitions.d.ts" />
-/// <reference path="../typings/requirejs/require.d.ts" />
-/// <reference path="../typings/mocha/mocha.d.ts" />
-/// <reference path="../typings/should/should.d.ts" />
-/// <reference path="../typings/sinon/sinon.d.ts" />
-
-requirejs.config({
+﻿requirejs.config({
     //baseUrl: "../",
 
     paths: {
@@ -27,9 +21,9 @@ requirejs.config({
 (<any>window).console = window.console || function () { return; };
 (<any>window).notrack = true;
 
-var tests = [
+const tests = [
     //"commands",
-];
+] as string[];
 
 require(tests, function () {
     mocha.run();

@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "es3",
+        "module": "umd",
+        "moduleResolution": "node",
+        "strict": true
+    },
+    "exclude": [
+        "dist",
+        "node_modules"
+    ]
+}

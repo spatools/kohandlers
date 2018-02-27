@@ -1,26 +1,28 @@
-﻿/// <reference path="../_definitions.d.ts" />
+﻿import {
+    unwrap,
+    bindingHandlers
+} from "knockout";
 
-import ko = require("knockout");
-import utils = require("koutils/utils");
-var handlers = ko.bindingHandlers;
+bindingHandlers.limitedText = {
+    init(element, valueAccessor) {
+        const
+            options = unwrap(valueAccessor()),
+            attr = unwrap(options.attr || "text");
 
-handlers.limitedText = {
-    init: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var options = ko.unwrap(valueAccessor()),
-            attr = ko.unwrap(options.attr || "text");
-
-        if (attr === "html")
-            handlers.html.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+        if (attr === "html") {
+            return bindingHandlers.html.init();
+        }
     },
-    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var options = ko.unwrap(valueAccessor()),
-            text = ko.unwrap(options.text),
-            length = ko.unwrap(options.length),
-            suffix = ko.unwrap(options.suffix || "..."),
-            escapeCR = ko.unwrap(options.escapeCR || false),
-            attr = ko.unwrap(options.attr || "text");
+    update(element, valueAccessor) {
+        const
+            options = unwrap(valueAccessor()),
+            text = unwrap(options.text),
+            length = unwrap(options.length),
+            suffix = unwrap(options.suffix || "..."),
+            escapeCR = unwrap(options.escapeCR || false),
+            attr = unwrap(options.attr || "text");
 
-        var result = text;
+        let result = text;
         if (text) {
             if (text.length > length)
                 result = result.substr(0, length) + suffix;
@@ -30,47 +32,116 @@ handlers.limitedText = {
         }
 
         if (attr === "text") {
-            handlers.text.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
+            bindingHandlers.text.update(element, () => result);
         }
         else if (attr === "html") {
-            handlers.html.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
+            bindingHandlers.html.update(element, () => result);
         }
         else {
-            var obj = {};
-            obj[attr] = result;
-            handlers.attr.update(element, utils.createAccessor(obj), allBindingsAccessor, viewModel, bindingContext);
+            const obj = { [attr]: result };
+            bindingHandlers.attr.update(element as HTMLElement, () => obj);
         }
     }
 };
 
-handlers.pad = {
-    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var options = ko.unwrap(valueAccessor()),
-            text = String(ko.unwrap(options.text)),
-            length = ko.unwrap(options.length),
-            char = ko.unwrap(options.char || "0"),
-            prefix = ko.unwrap(options.prefix || ""),
-            right = ko.unwrap(options.right || false);
+bindingHandlers.pad = {
+    update(element, valueAccessor) {
+        var options = unwrap(valueAccessor()),
+            text = String(unwrap(options.text)),
+            length = unwrap(options.length),
+            char = unwrap(options.char || "0"),
+            prefix = unwrap(options.prefix || ""),
+            right = unwrap(options.right || false);
 
         while (text.length < length) {
             text = right ? text + char : char + text;
         }
 
-        handlers.text.update(element, utils.createAccessor(prefix + text), allBindingsAccessor, viewModel, bindingContext);
+        bindingHandlers.text.update(element, () => prefix + text);
     }
 };
 
-handlers.format = {
-    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var options = ko.unwrap(valueAccessor()),
-            format = ko.unwrap(options.format),
-            values = ko.unwrap(options.values),
-            args = [format];
+bindingHandlers.format = {
+    update(element, valueAccessor) {
+        const
+            options = unwrap(valueAccessor()),
+            formt = unwrap(options.format),
+            values = unwrap(options.values);
 
-        values.forEach(value => {
-            args.push(ko.unwrap(value));
-        });
-
-        handlers.text.update(element, utils.createAccessor(utils.format.apply(null, args)), allBindingsAccessor, viewModel, bindingContext);
+        bindingHandlers.text.update(element, () => format(formt, values));
     }
 };
+
+function format(text: string, args: any[]): string {
+    return text.replace(/\{+-?[0-9]+(:[^}]+)?\}+/g, tag => {
+        const match = tag.match(/(\{+)(-?[0-9]+)(:([^\}]+))?(\}+)/);
+        if (!match) {
+            return;
+        }
+
+        const index = parseInt(match[2], 10);
+        if (match[1].length > 1 && match[5].length > 1) {
+            return "{" + index + (match[3] || "") + "}";
+        }
+
+        let value = args[index];
+        if (typeof value === "undefined") {
+            value = "";
+        } else if (typeof value !== "string") {
+            value = String(value);
+        }
+
+        if (match[3]) {
+            switch (match[4]) {
+                case "U":
+                    return value.toUpperCase();
+                case "u":
+                    return value.toLowerCase();
+                default:
+                    const win = window as any;
+                    if (win.Globalize !== "undefined") {
+                        win.Globalize.format(value, match[4]);
+                    }
+                    break;
+            }
+        }
+
+        return value;
+    });
+}
+
+declare module "knockout" {
+    interface BindingHandlers {
+        limitedText: {
+            init(element: Node, valueAccessor: () => MaybeSubscribable<LimitedTextOptions>): void;
+            update(element: Node, valueAccessor: () => MaybeSubscribable<LimitedTextOptions>): void;
+        };
+        pad: {
+            update(element: Node, valueAccessor: () => MaybeSubscribable<PadOptions>): void;
+        };
+        format: {
+            update(element: Node, valueAccessor: () => MaybeSubscribable<FormatOptions>): void;
+        };
+    }
+}
+
+export interface LimitedTextOptions {
+    text: string;
+    length: number;
+    attr?: string | null;
+    suffix?: string | null;
+    escapeCR?: boolean | null;
+}
+
+export interface PadOptions {
+    text: string | number;
+    length: number;
+    char?: string | null;
+    prefix?: string | null;
+    right?: boolean | null;
+}
+
+export interface FormatOptions {
+    format: string;
+    values: any[];
+}

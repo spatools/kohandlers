@@ -1,24 +1,42 @@
-﻿/// <reference path="../_definitions.d.ts" />
+﻿import {
+    bindingHandlers,
+    unwrap
+} from "knockout";
 
-import ko = require("knockout");
-var handlers = ko.bindingHandlers;
-
-handlers.debug = {
-    update: function (element: HTMLElement, valueAccessor: () => any, allBindingsAccessor: () => any, viewModel: any, bindingContext: KnockoutBindingContext) {
-        var options = ko.unwrap(valueAccessor()),
-            message = "Debug Binding", value = options;
+bindingHandlers.debug = {
+    update(element, valueAccessor) {
+        const options = unwrap(valueAccessor());
+        let message = "Debug Binding",
+            value = options;
 
         if (options.message && options.value) {
-            value = ko.unwrap(options.value);
-            message = ko.unwrap(options.message) || "Debug Binding";
+            value = unwrap(options.value);
+            message = unwrap(options.message) || "Debug Binding";
         }
 
         console.log(message, value);
     }
 };
 
-handlers.console = {
-    update: function (element, valueAccessor) {
-        console.log(ko.unwrap(valueAccessor()));
+bindingHandlers.console = {
+    update(element, valueAccessor) {
+        console.log(unwrap(valueAccessor()));
     }
 };
+
+export interface DebugOptions {
+    message?: string;
+    value: any;
+}
+
+declare module "knockout" {
+    interface BindingHandlers {
+        debug: {
+            update(element: Node, valueAccessor: () => any): void;
+        };
+
+        console: {
+            update(element: Node, valueAccessor: () => any): void;
+        };
+    }
+}
