@@ -1,9 +1,0 @@
-# Dev folders
-nuget/
-test/
-
-# Dev files
-.travis.yml
-package-lock.json
-tslint.json
-tsconfig.json
