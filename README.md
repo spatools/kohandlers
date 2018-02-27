@@ -16,6 +16,12 @@ Using NuGet:
 $ Install-Package KoHandlers
 ```
 
+Using NPM: 
+
+```console
+$ npm install kohandlers --save
+```
+
 ## Usage
 
 You could use kohandlers in different context.
@@ -28,9 +34,7 @@ You could use kohandlers in different context.
 requirejs.config({
     paths: {
         knockout: 'path/to/knockout',
-        underscore: 'path/to/underscore',
-        jquery: 'path/to/jquery',
-        koutils: 'path/to/koutils',
+        jquery: 'path/to/jquery', // Optional
         kohandlers: 'path/to/kohandlers'
     }
 });
@@ -50,9 +54,7 @@ Include built script in your HTML file.
 
 ```html
 <script type="text/javascript" src="path/to/knockout.js"></script>
-<script type="text/javascript" src="path/to/underscore.js"></script>
-<script type="text/javascript" src="path/to/jquery.js"></script>
-<script type="text/javascript" src="path/to/koutils.min.js"></script>
+<script type="text/javascript" src="path/to/jquery.js"></script> <!-- Optional -->
 <script type="text/javascript" src="path/to/kohandlers.min.js"></script>
 ```
 

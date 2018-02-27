@@ -16,6 +16,7 @@ test/helpers/*.d.ts
 test/helpers/*.js
 test/helpers/*.js.map
 nuget/*.nupkg
+*.tmp.txt
 
 # Build results
 [Dd]ebug/
