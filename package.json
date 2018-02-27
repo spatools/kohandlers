@@ -7,7 +7,7 @@
     "bugs": {
         "url": "https://github.com/spatools/kohandlers/issues"
     },
-    "main": "dist/all.js",
+    "main": "dist/index.js",
     "scripts": {
         "test": "grunt"
     },
