@@ -23,60 +23,46 @@ module.exports = function (grunt) {
             test: 'test'
         },
 
-        typescript: {
+        ts: {
             options: {
-                target: "es3",
-                module: "umd",
-                moduleResolution: "node",
-                sourceMap: false,
-                declaration: false,
-                removeComments: true
+                fast: "never"
+                // target: "es3",
+                // module: "umd",
+                // moduleResolution: "node",
+                // sourceMap: false,
+                // declaration: false,
+                // removeComments: true
             },
             dev: {
-                src: "<%= paths.src %>/**/*.ts",
+                // src: "<%= paths.src %>/**/*.ts",
+                tsconfig: {
+                    tsconfig: "tsconfig.json",
+                    updateFiles: false,
+                    passThrough: true
+                },
                 options: {
-                    sourceMap: true
+                    additionalFlags: "--sourceMap"
                 }
             },
             test: {
-                src: "<%= paths.test %>/**/*.ts"
-            },
-            declaration: {
-                src: "<%= paths.src %>/**/*.ts",
-                dest: "<%= paths.temp %>/",
+                tsconfig: {
+                    tsconfig: "<%= paths.test %>/tsconfig.json",
+                    updateFiles: false,
+                    passThrough: true
+                },
                 options: {
-                    basePath: '<%= paths.src %>',
-                    declaration: true
+                    additionalFlags: "--sourceMap"
                 }
             },
             dist: {
-                src: "<%= paths.src %>/**/*.ts",
-                dest: "<%= paths.build %>/",
+                tsconfig: {
+                    tsconfig: "tsconfig.json",
+                    updateFiles: false,
+                    passThrough: true
+                },
                 options: {
-                    basePath: '<%= paths.src %>'
+                    additionalFlags: "--outDir <%= paths.build %> --declaration"
                 }
-            }
-        },
-
-        concat: {
-            declaration: {
-                src: [
-                    "<%= paths.src %>/base.d.ts",
-                    "<%= paths.temp %>/temp.d.ts"
-                ],
-                dest: "<%= paths.build %>/kohandlers.d.ts"
-            }
-        },
-
-        tsdamdconcat: {
-            options: {
-                removeReferences: true,
-                basePath: "<%= paths.temp %>",
-                prefixPath: "koutils"
-            },
-            declaration: {
-                src: "<%= paths.temp %>/*.d.ts",
-                dest: "<%= paths.temp %>/temp.d.ts"
             }
         },
 
@@ -109,7 +95,6 @@ module.exports = function (grunt) {
         clean: {
             dev: [
                 "<%= paths.src %>/**/*.d.ts",
-                "!<%= paths.src %>/base.d.ts",
                 "<%= paths.src %>/**/*.js",
                 "<%= paths.src %>/**/*.js.map"
             ],
@@ -154,16 +139,9 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask("fixdecla", function () {
-        var content = grunt.file.read("dist/kohandlers.d.ts");
-        content = content.replace(/\.{2}\/typings/g, "../../../typings");
-        grunt.file.write("dist/kohandlers.d.ts", content);
-    });
-
-    grunt.registerTask("declaration", ["typescript:declaration", "tsdamdconcat:declaration", "concat:declaration", "clean:temp", "fixdecla"]);
-    grunt.registerTask("build", ["tslint:dev", "typescript:dist", "declaration"]);
-    grunt.registerTask("dev", ["tslint:dev", "typescript:dev"]);
-    grunt.registerTask("test", ["dev", "tslint:test", "typescript:test", "mocha:test", "clean"]);
+    grunt.registerTask("build", ["tslint:dev", "ts:dist"]);
+    grunt.registerTask("dev", ["tslint:dev", "ts:dev"]);
+    grunt.registerTask("test", ["dev", "tslint:test", "ts:test", "mocha:test", "clean"]);
     grunt.registerTask("nuget", ["nugetpack", "nugetpush"]);
 
     grunt.registerTask("default", ["clean", "test", "build"]);

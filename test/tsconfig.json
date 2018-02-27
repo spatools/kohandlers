@@ -1,14 +1,12 @@
 {
     "compilerOptions": {
         "target": "es3",
-        "module": "umd",
+        "module": "amd",
         "moduleResolution": "node",
         "strict": true
     },
     "exclude": [
-        "dist",
         "bower_components",
-        "node_modules",
-        "test"
+        "node_modules"
     ]
 }
