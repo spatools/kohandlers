@@ -1,13 +1,24 @@
-define(["require", "exports", "knockout", "koutils/utils"], function (require, exports, ko, utils) {
-    var handlers = ko.bindingHandlers;
-    handlers.limitedText = {
-        init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var options = ko.unwrap(valueAccessor()), attr = ko.unwrap(options.attr || "text");
-            if (attr === "html")
-                handlers.html.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "knockout"], factory);
+    }
+})(function (require, exports) {
+    "use strict";
+    exports.__esModule = true;
+    var knockout_1 = require("knockout");
+    knockout_1.bindingHandlers.limitedText = {
+        init: function (element, valueAccessor) {
+            var options = knockout_1.unwrap(valueAccessor()), attr = knockout_1.unwrap(options.attr || "text");
+            if (attr === "html") {
+                return knockout_1.bindingHandlers.html.init();
+            }
         },
-        update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var options = ko.unwrap(valueAccessor()), text = ko.unwrap(options.text), length = ko.unwrap(options.length), suffix = ko.unwrap(options.suffix || "..."), escapeCR = ko.unwrap(options.escapeCR || false), attr = ko.unwrap(options.attr || "text");
+        update: function (element, valueAccessor) {
+            var options = knockout_1.unwrap(valueAccessor()), text = knockout_1.unwrap(options.text), length = knockout_1.unwrap(options.length), suffix = knockout_1.unwrap(options.suffix || "..."), escapeCR = knockout_1.unwrap(options.escapeCR || false), attr = knockout_1.unwrap(options.attr || "text");
             var result = text;
             if (text) {
                 if (text.length > length)
@@ -17,34 +28,65 @@ define(["require", "exports", "knockout", "koutils/utils"], function (require, e
                 }
             }
             if (attr === "text") {
-                handlers.text.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
+                knockout_1.bindingHandlers.text.update(element, function () { return result; });
             }
             else if (attr === "html") {
-                handlers.html.update(element, utils.createAccessor(result), allBindingsAccessor, viewModel, bindingContext);
+                knockout_1.bindingHandlers.html.update(element, function () { return result; });
             }
             else {
-                var obj = {};
-                obj[attr] = result;
-                handlers.attr.update(element, utils.createAccessor(obj), allBindingsAccessor, viewModel, bindingContext);
+                var obj_1 = (_a = {}, _a[attr] = result, _a);
+                knockout_1.bindingHandlers.attr.update(element, function () { return obj_1; });
             }
+            var _a;
         }
     };
-    handlers.pad = {
-        update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var options = ko.unwrap(valueAccessor()), text = String(ko.unwrap(options.text)), length = ko.unwrap(options.length), char = ko.unwrap(options.char || "0"), prefix = ko.unwrap(options.prefix || ""), right = ko.unwrap(options.right || false);
+    knockout_1.bindingHandlers.pad = {
+        update: function (element, valueAccessor) {
+            var options = knockout_1.unwrap(valueAccessor()), text = String(knockout_1.unwrap(options.text)), length = knockout_1.unwrap(options.length), char = knockout_1.unwrap(options.char || "0"), prefix = knockout_1.unwrap(options.prefix || ""), right = knockout_1.unwrap(options.right || false);
             while (text.length < length) {
                 text = right ? text + char : char + text;
             }
-            handlers.text.update(element, utils.createAccessor(prefix + text), allBindingsAccessor, viewModel, bindingContext);
+            knockout_1.bindingHandlers.text.update(element, function () { return prefix + text; });
         }
     };
-    handlers.format = {
-        update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var options = ko.unwrap(valueAccessor()), format = ko.unwrap(options.format), values = ko.unwrap(options.values), args = [format];
-            values.forEach(function (value) {
-                args.push(ko.unwrap(value));
-            });
-            handlers.text.update(element, utils.createAccessor(utils.format.apply(null, args)), allBindingsAccessor, viewModel, bindingContext);
+    knockout_1.bindingHandlers.format = {
+        update: function (element, valueAccessor) {
+            var options = knockout_1.unwrap(valueAccessor()), formt = knockout_1.unwrap(options.format), values = knockout_1.unwrap(options.values);
+            knockout_1.bindingHandlers.text.update(element, function () { return format(formt, values); });
         }
     };
+    function format(text, args) {
+        return text.replace(/\{+-?[0-9]+(:[^}]+)?\}+/g, function (tag) {
+            var match = tag.match(/(\{+)(-?[0-9]+)(:([^\}]+))?(\}+)/);
+            if (!match) {
+                return;
+            }
+            var index = parseInt(match[2], 10);
+            if (match[1].length > 1 && match[5].length > 1) {
+                return "{" + index + (match[3] || "") + "}";
+            }
+            var value = args[index];
+            if (typeof value === "undefined") {
+                value = "";
+            }
+            else if (typeof value !== "string") {
+                value = String(value);
+            }
+            if (match[3]) {
+                switch (match[4]) {
+                    case "U":
+                        return value.toUpperCase();
+                    case "u":
+                        return value.toLowerCase();
+                    default:
+                        var win = window;
+                        if (win.Globalize !== "undefined") {
+                            win.Globalize.format(value, match[4]);
+                        }
+                        break;
+                }
+            }
+            return value;
+        });
+    }
 });

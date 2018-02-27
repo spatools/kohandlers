@@ -1,5 +1,21 @@
-define(["require", "exports", "knockout", "koutils/utils"], function (require, exports, ko, utils) {
-    var handlers = ko.bindingHandlers;
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "knockout"], factory);
+    }
+})(function (require, exports) {
+    "use strict";
+    exports.__esModule = true;
+    var knockout_1 = require("knockout");
+    knockout_1.bindingHandlers.filesize = {
+        update: function (element, valueAccessor, allBindingsAccessor) {
+            var value = knockout_1.unwrap(valueAccessor()), suffix = allBindingsAccessor().suffix || "B";
+            knockout_1.bindingHandlers.text.update(element, function () { return simplifySize(value, suffix); });
+        }
+    };
     var sizes = {
         k: 1024,
         M: 1024 * 1024,
@@ -7,25 +23,19 @@ define(["require", "exports", "knockout", "koutils/utils"], function (require, e
         T: 1024 * 1024 * 1024 * 1024
     };
     function simplifySize(size, suffix) {
-        if (suffix === void 0) { suffix = ""; }
         if (!size) {
             return "";
         }
-        var _size = parseInt(size, 10), result = _size, unit = "";
+        var parsedSize = typeof size === "string" ? parseInt(size, 10) : size;
+        var result = parsedSize, unit = "";
         for (var key in sizes) {
-            if (size > sizes[key]) {
-                result = _size / sizes[key];
+            if (parsedSize > sizes[key]) {
+                result = parsedSize / sizes[key];
                 unit = key;
                 break;
             }
         }
         result = Math.round(result * 100) / 100;
-        return utils.format("{0} {1}{2}", result, unit, suffix);
+        return result + " " + unit + suffix;
     }
-    handlers.filesize = {
-        update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var value = ko.unwrap(valueAccessor()), suffix = allBindingsAccessor().suffix || "B";
-            ko.bindingHandlers.text.update(element, utils.createAccessor(simplifySize(value, suffix)), allBindingsAccessor, viewModel, bindingContext);
-        }
-    };
 });

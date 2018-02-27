@@ -1,27 +1,38 @@
-define(["require", "exports", "knockout", "koutils/utils"], function (require, exports, ko, utils) {
-    var handlers = ko.bindingHandlers;
-    handlers.src = {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "knockout"], factory);
+    }
+})(function (require, exports) {
+    "use strict";
+    exports.__esModule = true;
+    var knockout_1 = require("knockout");
+    knockout_1.bindingHandlers.src = {
         update: function (element, valueAccessor) {
-            var value = ko.unwrap(valueAccessor());
-            if (element.src !== value)
+            var value = knockout_1.unwrap(valueAccessor());
+            if (element.getAttribute("src") !== value) {
                 element.setAttribute("src", value);
+            }
         }
     };
-    handlers.href = {
-        update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var value = ko.unwrap(valueAccessor());
-            ko.bindingHandlers.attr.update(element, utils.createAccessor({ href: value }), allBindingsAccessor, viewModel, bindingContext);
+    knockout_1.bindingHandlers.href = {
+        update: function (element, valueAccessor) {
+            var href = knockout_1.unwrap(valueAccessor());
+            knockout_1.bindingHandlers.attr.update(element, function () { return { href: href }; });
         }
     };
-    handlers.mailto = {
-        update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var email = ko.unwrap(valueAccessor());
-            ko.bindingHandlers.href.update(element, utils.createAccessor("mailto:" + email), allBindingsAccessor, viewModel, bindingContext);
+    knockout_1.bindingHandlers.mailto = {
+        update: function (element, valueAccessor) {
+            var email = knockout_1.unwrap(valueAccessor());
+            knockout_1.bindingHandlers.href.update(element, function () { return "mailto:" + email; });
         }
     };
-    handlers.classes = {
-        update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            ko.bindingHandlers.css.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+    knockout_1.bindingHandlers.classes = {
+        update: function (element, valueAccessor) {
+            knockout_1.bindingHandlers.css.update(element, valueAccessor);
         }
     };
 });
