@@ -1,6 +1,6 @@
 {
     "name": "kohandlers",
-    "version": "0.1.4",
+    "version": "1.0.0",
     "description": "Knockout Binding Handlers to help Knockout app development",
     "author": "SPA Tools",
     "license": "MIT",
