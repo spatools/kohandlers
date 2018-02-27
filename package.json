@@ -9,7 +9,7 @@
     },
     "main": "dist/index.js",
     "scripts": {
-        "test": "grunt"
+        "test": "grunt build"
     },
     "repository": {
         "type": "git",
